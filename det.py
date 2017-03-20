@@ -181,6 +181,7 @@ class Exfiltration(object):
             files[jobid]['filename'] = message[1].lower()
             files[jobid]['data'] = []
             files[jobid]['packets_number'] = []
+            files[jobid]['packets_len'] = -1
             warning("Register packet for file %s with checksum %s" %
                     (files[jobid]['filename'], files[jobid]['checksum']))
 
@@ -189,6 +190,9 @@ class Exfiltration(object):
         fname = files[jobid]['filename']
         filename = "%s.%s" % (fname.replace(
             os.path.pathsep, ''), time.strftime("%Y-%m-%d.%H:%M:%S", time.gmtime()))
+        #Reorder packets before reassembling / ugly one-liner hack
+        files[jobid]['packets_number'], files[jobid]['data'] = \
+                [list(x) for x in zip(*sorted(zip(files[jobid]['packets_number'], files[jobid]['data'])))]
         content = ''.join(str(v) for v in files[jobid]['data']).decode('hex')
         content = aes_decrypt(content, self.KEY)
         if COMPRESSION:
@@ -216,13 +220,21 @@ class Exfiltration(object):
                     self.register_file(message)
                 # done packet
                 elif (message[2] == "DONE"):
-                    self.retrieve_file(jobid)
+                    files[jobid]['packets_len'] = int(message[1])
+                    #Check if all packets have arrived
+                    if files[jobid]['packets_len'] == len(files[jobid]['data']):
+                        self.retrieve_file(jobid)
+                    else:
+                        warning("[!] Received the last packet, but some are still missing. Waiting for the rest...")
                 # data packet
                 else:
                     # making sure there's a jobid for this file
                     if (jobid in files and message[1] not in files[jobid]['packets_number']):
                         files[jobid]['data'].append(''.join(message[2:]))
-                        files[jobid]['packets_number'].append(message[1])
+                        files[jobid]['packets_number'].append(int(message[1]))
+                        #In case this packet was the last missing one
+                        if files[jobid]['packets_len'] == len(files[jobid]['data']):
+                            self.retrieve_file(jobid)
         except:
             raise
             pass
