@@ -16,6 +16,9 @@ from os.path import isfile, join
 from Crypto.Cipher import AES
 from zlib import compress, decompress
 
+if getattr(sys, 'frozen', False):
+    os.chdir(sys._MEIPASS)
+
 KEY = ""
 MIN_TIME_SLEEP = 1
 MAX_TIME_SLEEP = 30
