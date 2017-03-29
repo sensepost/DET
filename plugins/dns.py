@@ -1,17 +1,14 @@
-from dnslib import *
-try:
-    from scapy.all import *
-except:
-    print "You should install Scapy if you run the server.."
+from dnslib import DNSRecord
+import socket
+from dpkt import dns
 
 app_exfiltrate = None
 config = None
 buf = {}
 
-def handle_dns_packet(x):
+def handle_dns_query(qname):
     global buf
     try:
-        qname = x.payload.payload.payload.qd.qname
         if (config['key'] in qname):
             app_exfiltrate.log_message(
                 'info', '[dns] DNS Query: {0}'.format(qname))
@@ -77,9 +74,23 @@ def send(data):
 def listen():
     app_exfiltrate.log_message(
         'info', "[dns] Waiting for DNS packets for domain {0}".format(config['key']))
-    sniff(filter="udp and port {}".format(
-        config['port']), prn=handle_dns_packet)
+    sniff()
 
+def sniff():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    IP = "0.0.0.0"
+    PORT = 53
+    sock.bind((IP, PORT))
+    while True:
+        try:
+            data, addr = sock.recvfrom(65536)
+            #query = dpkt.dns.DNS(data)
+            query = dns.DNS(data)
+            for qname in query.qd:
+                handle_dns_query(qname.name + '.')
+        except:
+            sock.shutdown()
+            sock.close()
 
 class Plugin:
 
