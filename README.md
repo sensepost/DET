@@ -36,7 +36,7 @@ Slides are available [here](https://docs.google.com/presentation/d/11uk6d-xougn3
 Clone the repo: 
 
 ```bash
-git clone https://github.com/sensepost/DET.git
+git clone https://github.com/conix-security/DET.git
 ```
 
 Then: 
@@ -115,6 +115,7 @@ optional arguments:
   -p PLUGIN   Plugins to use (eg. '-p dns,twitter')
   -e EXCLUDE  Plugins to exclude (eg. '-e gmail,icmp')
   -L          Server mode
+  -Z          Zombie mode
 ```
 
 ## Server-side: 
@@ -164,6 +165,12 @@ PS C:\Users\user01\Desktop> . .\http_exfil.ps1
 PS C:\Users\user01\Desktop> HTTP-exfil 'C:\path\to\file.exe'
 ```
 
+## Zombie mode:
+
+In this mode the client is also a server.
+
+The zombie waits for incoming packets, and relays them to the final server.
+
 # Modules
 
 So far, DET supports multiple protocols, listed here: 
@@ -192,6 +199,7 @@ So far, I am busy implementing new modules which are almost ready to ship, inclu
 
 - [X] Add proper encryption (eg. AES-256) Thanks to [ryanohoro](https://github.com/ryanohoro)
 - [X] Compression (extremely important!) Thanks to [chokepoint](https://github.com/chokepoint)
+- [X] Add support for C&C-like multi-host file exfiltration (Zombie mode)
 - [ ] Proper data obfuscation and integrating [Cloakify Toolset Toolset](https://github.com/trycatchhcf/cloakify)
 - [ ] FTP, FlickR [LSB Steganography](https://github.com/RobinDavid/LSB-Steganography) and Youtube modules
 

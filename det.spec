@@ -6,7 +6,7 @@ import sys
 sys.modules['FixTk'] = None
 
 a = Analysis(['det.py'],
-             pathex=['/home/nisay/DET-conix'],
+             pathex=['.'],
              binaries=[],
              datas=[('plugins', 'plugins'), ('config-sample.json', '.')],
              hiddenimports=['plugins/dns', 'plugins/icmp'],

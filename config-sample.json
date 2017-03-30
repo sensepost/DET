@@ -11,7 +11,8 @@
         "dns": {
             "key": "google.com",
             "target": "192.168.0.12",
-            "port": 53
+            "port": 53,
+            "zombies": ["192.168.0.13", "192.168.0.14"]
         },
         "gmail": {
             "username": "dataexfil@gmail.com",
