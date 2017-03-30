@@ -4,3 +4,4 @@ pysocks
 dnslib
 pycrypto
 slackclient
+dpkt
