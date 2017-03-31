@@ -1,3 +1,5 @@
+[![Black Hat Arsenal](https://www.toolswatch.org/badges/arsenal/2016.svg)](https://www.toolswatch.org/blackhat-arsenal-us-2016-archive/)
+
 DET (extensible) Data Exfiltration Toolkit
 =======
 
