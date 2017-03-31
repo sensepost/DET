@@ -26,7 +26,8 @@
         },
         "udp": {
             "target": "192.168.0.12",
-            "port": 6969
+            "port": 6969,
+            "zombies": ["192.168.0.13", "192.168.0.14"]
         },
         "twitter": {
             "username": "PaulWebSec",

