@@ -36,7 +36,8 @@
             "ACCESS_TOKEN_SECRET": "XXXXXXXXXXX"
         },
         "icmp": {
-            "target": "192.168.0.12"
+            "target": "192.168.0.12",
+            "zombies": ["192.168.0.13", "192.168.0.14"]
         },
         "slack": {
             "api_token": "xoxb-XXXXXXXXXXX",
