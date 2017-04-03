@@ -2,7 +2,8 @@
     "plugins": {
         "http": {
             "target": "192.168.0.12",
-            "port": 8080
+            "port": 8080,
+            "zombies": ["192.168.0.13", "192.168.0.14"]
         },
         "google_docs": {
             "target": "conchwaiter.uk.plak.cc",
