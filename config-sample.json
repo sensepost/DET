@@ -46,6 +46,11 @@
             "api_token": "xoxb-XXXXXXXXXXX",
             "chan_id": "XXXXXXXXXXX",
             "bot_id": "<@XXXXXXXXXXX>:"
+        },
+        "smtp": {
+            "target": "192.168.0.12",
+            "port": 25,
+            "zombies": ["192.168.0.13", "192.168.0.14"]
         }
     },
     "AES_KEY": "THISISACRAZYKEY",
