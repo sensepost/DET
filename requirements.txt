@@ -5,3 +5,6 @@ dnslib
 pycrypto
 slackclient
 dpkt
+pyftpdlib
+email
+smtplib
