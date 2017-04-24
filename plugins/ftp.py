@@ -26,8 +26,11 @@ class CustomFTPHandler(FTPHandler):
         return path
 
 def send(data):
-    targets = [config['target']] + config['zombies']
-    target = choice(targets)
+    if config.has_key('zombies') and config['zombies'] != [""]:
+        targets = [config['target']] + config['zombies']
+        target = choice(targets)
+    else:
+        target = config['target']
     port = config['port']
     try:
         ftp = FTP()

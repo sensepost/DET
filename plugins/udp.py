@@ -7,8 +7,11 @@ app_exfiltrate = None
 
 
 def send(data):
-    targets = [config['target']] + config['zombies']
-    target = choice(targets)
+    if config.has_key('zombies') and config['zombies'] != [""]:
+        targets = [config['target']] + config['zombies']
+        target = choice(targets)
+    else:
+        target = config['target']
     port = config['port']
     app_exfiltrate.log_message(
         'info', "[udp] Sending {0} bytes to {1}".format(len(data), target))
