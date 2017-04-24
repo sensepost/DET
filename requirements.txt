@@ -1,6 +1,8 @@
 tweepy
-scapy
 pysocks
 dnslib
 pycrypto
 slackclient
+dpkt>=1.9.1
+pyftpdlib
+email

@@ -16,6 +16,9 @@ from os.path import isfile, join
 from Crypto.Cipher import AES
 from zlib import compress, decompress
 
+if getattr(sys, 'frozen', False):
+    os.chdir(sys._MEIPASS)
+
 KEY = ""
 MIN_TIME_SLEEP = 1
 MAX_TIME_SLEEP = 30
@@ -323,8 +326,11 @@ def main():
                         default=None, help="Plugins to use (eg. '-p dns,twitter')")
     parser.add_argument('-e', action="store", dest="exclude",
                         default=None, help="Plugins to exclude (eg. '-e gmail,icmp')")
-    parser.add_argument('-L', action="store_true",
+    listenMode = parser.add_mutually_exclusive_group()
+    listenMode.add_argument('-L', action="store_true",
                         dest="listen", default=False, help="Server mode")
+    listenMode.add_argument('-Z', action="store_true",
+                        dest="zombie", default=False, help="Zombie mode")
     results = parser.parse_args()
 
     if (results.config is None):
@@ -347,12 +353,15 @@ def main():
     KEY = config['AES_KEY']
     app = Exfiltration(results, KEY)
 
-    # LISTEN MODE
-    if (results.listen):
+    # LISTEN/ZOMBIE MODE
+    if (results.listen or results.zombie):
         threads = []
         plugins = app.get_plugins()
         for plugin in plugins:
-            thread = threading.Thread(target=plugins[plugin]['listen'])
+            if results.listen:
+                thread = threading.Thread(target=plugins[plugin]['listen'])
+            elif results.zombie:
+                thread = threading.Thread(target=plugins[plugin]['zombie'])
             thread.daemon = True
             thread.start()
             threads.append(thread)
