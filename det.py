@@ -315,7 +315,7 @@ def main():
     global threads, config
 
     parser = argparse.ArgumentParser(
-        description='Data Exfiltration Toolkit (SensePost)')
+        description='Data Exfiltration Toolkit (Conix-Security)')
     parser.add_argument('-c', action="store", dest="config", default=None,
                         help="Configuration file (eg. '-c ./config-sample.json')")
     parser.add_argument('-f', action="store", dest="file",
@@ -330,7 +330,7 @@ def main():
     listenMode.add_argument('-L', action="store_true",
                         dest="listen", default=False, help="Server mode")
     listenMode.add_argument('-Z', action="store_true",
-                        dest="zombie", default=False, help="Zombie mode")
+                        dest="proxy", default=False, help="Proxy mode")
     results = parser.parse_args()
 
     if (results.config is None):
@@ -353,15 +353,15 @@ def main():
     KEY = config['AES_KEY']
     app = Exfiltration(results, KEY)
 
-    # LISTEN/ZOMBIE MODE
-    if (results.listen or results.zombie):
+    # LISTEN/PROXY MODE
+    if (results.listen or results.proxy):
         threads = []
         plugins = app.get_plugins()
         for plugin in plugins:
             if results.listen:
                 thread = threading.Thread(target=plugins[plugin]['listen'])
-            elif results.zombie:
-                thread = threading.Thread(target=plugins[plugin]['zombie'])
+            elif results.proxy:
+                thread = threading.Thread(target=plugins[plugin]['proxy'])
             thread.daemon = True
             thread.start()
             threads.append(thread)

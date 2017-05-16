@@ -67,8 +67,8 @@ def listen():
         app_exfiltrate.log_message(
             'warning', "[twitter] Couldn't listen for Twitter DMs".format(e))
 
-def zombie():
-    app_exfiltrate.log_message('info', "[zombie] [twitter] Zombie mode unavailable (useless) for twitter plugin...")
+def proxy():
+    app_exfiltrate.log_message('info', "[proxy] [twitter] proxy mode unavailable (useless) for twitter plugin...")
 
 class Plugin:
 
@@ -76,5 +76,5 @@ class Plugin:
         global app_exfiltrate, config, USERNAME
         config = conf
         USERNAME = config['username']
-        app.register_plugin('twitter', {'send': send, 'listen': listen, 'zombie': zombie})
+        app.register_plugin('twitter', {'send': send, 'listen': listen, 'proxy': proxy})
         app_exfiltrate = app

