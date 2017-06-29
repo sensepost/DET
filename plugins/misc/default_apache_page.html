@@ -1,0 +1,364 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Apache2 Debian Default Page: It works</title>
+    <style type="text/css" media="screen">
+  * {
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+  }
+
+  body, html {
+    padding: 3px 3px 3px 3px;
+
+    background-color: #D8DBE2;
+
+    font-family: Verdana, sans-serif;
+    font-size: 11pt;
+    text-align: center;
+  }
+
+  div.main_page {
+    position: relative;
+    display: table;
+
+    width: 800px;
+
+    margin-bottom: 3px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0px 0px 0px 0px;
+
+    border-width: 2px;
+    border-color: #212738;
+    border-style: solid;
+
+    background-color: #FFFFFF;
+
+    text-align: center;
+  }
+
+  div.page_header {
+    height: 99px;
+    width: 100%;
+
+    background-color: #F5F6F7;
+  }
+
+  div.page_header span {
+    margin: 15px 0px 0px 50px;
+
+    font-size: 180%;
+    font-weight: bold;
+  }
+
+  div.page_header img {
+    margin: 3px 0px 0px 40px;
+
+    border: 0px 0px 0px;
+  }
+
+  div.table_of_contents {
+    clear: left;
+
+    min-width: 200px;
+
+    margin: 3px 3px 3px 3px;
+
+    background-color: #FFFFFF;
+
+    text-align: left;
+  }
+
+  div.table_of_contents_item {
+    clear: left;
+
+    width: 100%;
+
+    margin: 4px 0px 0px 0px;
+
+    background-color: #FFFFFF;
+
+    color: #000000;
+    text-align: left;
+  }
+
+  div.table_of_contents_item a {
+    margin: 6px 0px 0px 6px;
+  }
+
+  div.content_section {
+    margin: 3px 3px 3px 3px;
+
+    background-color: #FFFFFF;
+
+    text-align: left;
+  }
+
+  div.content_section_text {
+    padding: 4px 8px 4px 8px;
+
+    color: #000000;
+    font-size: 100%;
+  }
+
+  div.content_section_text pre {
+    margin: 8px 0px 8px 0px;
+    padding: 8px 8px 8px 8px;
+
+    border-width: 1px;
+    border-style: dotted;
+    border-color: #000000;
+
+    background-color: #F5F6F7;
+
+    font-style: italic;
+  }
+
+  div.content_section_text p {
+    margin-bottom: 6px;
+  }
+
+  div.content_section_text ul, div.content_section_text li {
+    padding: 4px 8px 4px 16px;
+  }
+
+  div.section_header {
+    padding: 3px 6px 3px 6px;
+
+    background-color: #8E9CB2;
+
+    color: #FFFFFF;
+    font-weight: bold;
+    font-size: 112%;
+    text-align: center;
+  }
+
+  div.section_header_red {
+    background-color: #CD214F;
+  }
+
+  div.section_header_grey {
+    background-color: #9F9386;
+  }
+
+  .floating_element {
+    position: relative;
+    float: left;
+  }
+
+  div.table_of_contents_item a,
+  div.content_section_text a {
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  div.table_of_contents_item a:link,
+  div.table_of_contents_item a:visited,
+  div.table_of_contents_item a:active {
+    color: #000000;
+  }
+
+  div.table_of_contents_item a:hover {
+    background-color: #000000;
+
+    color: #FFFFFF;
+  }
+
+  div.content_section_text a:link,
+  div.content_section_text a:visited,
+   div.content_section_text a:active {
+    background-color: #DCDFE6;
+
+    color: #000000;
+  }
+
+  div.content_section_text a:hover {
+    background-color: #000000;
+
+    color: #DCDFE6;
+  }
+
+  div.validator {
+  }
+    </style>
+  </head>
+  <body>
+    <div class="main_page">
+      <div class="page_header floating_element">
+        <img src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAEsAAABjCAYAAADTsf2xAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QsCEBc4jgrDswAAFhlJREFUeNrtXXmYVNWVP+cu773aq6mmG+jGFqHpFhWCOAqDe3AETZxBQUCMYESjUTNmwThJTBwHI6iJxrgMqBEXVMQFxQ1Eg6KiiYJ7L4CIYCPQe9f6lnvmj65qXhfVQBfYqNPn+/qP6rr3nnN/9+x16xVAL+0z4cFkXh2Y7GEh3wCnKdrGPNpIlCKl4ql3PceWGzzg4QCoYmuqGwBA+sZUmqVP/Yb+34FVWzh9oEqaJwHReeSoCYAA0A7Dx8Cwnvk8LyKCX0UTEjizAbAUiN4HxLU86Pm4/MsHmr7zYK0vnVnoNEevJkdNAIIjgbpQFEQCItxdUmwEhPUo+HJtYOEth316d9t3Eqzq0JTZlLJ+B0SBA8BXAWIUOVsKAMcDZ40Fl515XPG8GepbC9am46/mqU++GAamvZhs5/CvjREBoORPi6LQfKcpuq6iefGObxVYtQMuKFVtiV+R5UwHosJ9k6ZDnFYASAACBwIPAPi6NNkOuACRYRwQa0DwX1e2Pv7ytwKsmgEzKlRT25Og6Ii9CsDQAsHvRq/+Bmoyqhrb2gAgSoos5AxBKQ049wPCEFDqeFA0gRzVby+gt6DG51S2LrnlGw1WTcG0I1Qi9TwQle11sOAvMZ8xAxKp+oq2JXv0N+vLfoxOSxR50CtUNHWKSph3gFJD9jDFAo7XHh5/at43EqzqPtMqKGkuB0eV7cFcGlHyDSzovW9o3YP37GeedjVZ9m+BINiFhjko+Y8q25Y8eiD2xw6YRkWm96ek+UKXQCE2o+DXoqGdCYY2VR9x2P37y7OybclN6NHPAMY25D4a4mQ791RHph37jdKsKt+kFWA7p+VkwlkLhnzTK7Y9+PzX4iODU8qUZb8NqgtfxrDOe+KwIWXL5yQOumZVh6ZcDI5zUk6gBKsGKeaJsO+VryvyVrQu3iwigRHAWG4wFA1IrK6+96BrVk3f88IqmnwWFJ2QHZFA4385vHXJH3os8Q1PPYWS5nIgkjl22sK8xhkVjY++1aOaVdv3vO/V9p0+EACATOcIIBibZXZbUPCpPQkUAAAf3n8VcnZHR6XZObSEKGVOqzl0lugxsDaP+x2iR7fJceIAAOA4PwMi5vIPW0ETZ1dGl7zU04Vu+eu3kugTmAsI27OTXRQsAYjfh1i8z0Exw2r/5LfIsse4hGrlPuPsoQ2PvAIHkaoLpv6W4qk5HednaBeS4zyDmrweDe3aoXUPNPcoWDXhKdNVwnzYBZRCjzajsumxhw9Ih+LQH3udlniYkhaysC9ese3BfW7LEMVZtff8OCjS24MMfxE92lWAWAJKvV/R8GhTj/ksem8rUsqe5cYcpZh9IICqLTp/ZLVv0k32V83PUcJ8FZR6TTVH/17tPWdxdWjK2ftWYnoVStGRx5HtTFAJ86+iJFLDI0Grx3xWbf8Lzqo55RcjiGiYy0+1Mr/x+P6AtH3u41gdmHyL0xJ7jRw1GzkD1MXtzKvP4mH/FSjFUwB0YnXg3CdrItOK97oxv7Gw0z9sZ7AoDjeDotJ8Zex2ZECvZlFrbCwQFbn853YVTcT2w6T1xusX3w6OugQ5W8EKfJcO/fLBTTmGLl4/eJaXYqlz1w+66OnyTfe1dNnwaox+jJwBOe0lJ3q0tcl/biiRg4rMHtMsURReDQQ/zNL7+XplWXO+QhDRT4DoEtTFlZXxJ0/vAqj2iLfx3vjQrx5aKIrC2h4XlZwAYFcZZNoDvCcN2yQPLcq7Jd1tB19dMLWYklYdKMXSQG1iAc8JFTsXfZlX5ApOmUqm9TfUxDWVrY/ffsD6acXn6yphPkMp6/T0TuuY33tCRf2iz3oyKR3XARQAoORP5AvUhkMu7E+meSsK/saBBKo9WbYJHJXs3LJhPVsboqMO67SAIR/Ll7ndGJ0ECP1EcfjCA51rkWkDKJVy/asPpMxTt5z++7zr4W47eLKd6k4LlBZ+DjvzyaMuMuztzeOR85eHbLwnL82siUxDlLxAlhQ2D3rvtk7NQ5QCyLIBlJMpdwJkOSUDl1+vekyziFzNcEQ4bN3tjfkwdupbBwPQGcD5orzVxyFJtvq+0xr37Can4wARuYNAE2hiZY+aIfMZAVfBnP+nKJwVgiJATbybt/BBj8UDnhdQk4kc6zNELHHJ/SopVbc/YHXbDFU0yVxqtiHvMCx4AQgOZNp5Z9TlX9xPAJAzv+NBL6losoXsdjOUg/vdEDzt6Eb44+M9p1k84PXvms2+2A8XTGQ7AERn5rvCzj8uYfU3P5VzD05DG1HKCmTchfdfyuvaVqw1vpw8F3sMLJVMJVw9orzVmixnJyAAKHVcXmnH4FlHRp9ec0jh7LNzOmwW8PQnp31tFHxZ4KzjmkkpWbLkGuoxsACgw2xQ4615K5ZSLQCYBIJx3Z362TFXhVXKLnGao+EuDyOe+gMQtfeyNDm78Z7lDgt49usWTvfzLGR6x34TZt4XM1CTOwHxI7KcSG2/C7r16cth797WjAitQ9YveD93n23SCpWyLkwHoWecxpb1oEhnAW+qR8Ei1+foqIvCfBkPbXhkJwr2OiCA0xbv8oPQ2oEzRU3h9AnV/sk/Xl8648gO575l4Zo95IIVAEAo2Afo0W4ZBs8rHvL5Dnnu97Ee1ixsc+U5R+StWYjEI4GlgBgFx/nX6tC507qIAw5q4hPURB0AbNl7rXnu5QBQDAAW8+ozK+ofeaN+3hOC9wk0w35SPoX0qRRPvZLuY1kDb73Y4790gtP9vtiMf5OlkQ/NjXWTVCz1V2C4nhnyjIqmxXmlI7XhiahIu5hS5vz0rZq3eJ/A5PIv7q+DA0TdT0ql2LzLSZPcevX9E/OKhslUoV3XcFTw1O/NRynmgqJyMp2HqsNThnQzAcHaQ2YWKZvfQMk0ULq2cPBbt5x8IIHKL3WIJVqQs13VvBAteTr4Z8lR4dbXPjpflg/4G0p+HdnOaEpZL9QEJp+3L2s0XrmA1wTPvUk1RF8iy/mvdJpwo7eyZJYcfqgFB5i6b4bByUGy1Spw1Mi0cA9Wxp6YkQ/zz0b+Z8je2WyBopmAuE3FUoWUTC0AghRy9jZ69BsrGh5ZvrsJX1CpkqnTKWn9FBSVAwACYybTxblkaMsqv3roa7kB2G2waovP11U0+b9kOzPTofmpyviT5+yPENum3Iptq9ZeQ5ZNgLBWJcxnwVEaACBy5gBjq0mpzcgwDATHku30zyg6IKRQ8Cf0owb9ZNCamxPwNVJeqX+1f9JlZDt3pe/bfcGC3pMqdjz8+f4KU+2fNAuQnYiCCbKdZrKd/kBQCgDFQORPh9EYADQCwnYUfA36jYcrtj20HnqA8gMrOGUsmdYzQBQBAELOFoFHLqhseGz1JzABj4AX886UayLTilTKOoVpIgKcS7LsBhRiOwgWVc3RKA/7GRA1lX/10BZE7NF78XmB9fkxVxmJT7asAaW+l8m4AEChV7uysmnx/AMhWHXBVA8PeqVKmEdRyhwJlioAjTdxr76qvO7Bj+EgEOZvMpNvJMu+pnNsxZ2iMFBevuWBFvgOUt79aB723QmInZJRlLKGklYFfEcpb7DKty7ciqJzS5hMawh4tG29YOUgWdLnF6676wBE/Zz6tt/XTZ3HesHKosE18xtQ8Juy2hKHxN6u9fSClYsEuwsYutrLdLKKJY/pBSsHVTYv3py+mqjSxbVGSWvydxGsA3e123POuo68CxGY3xhVUf/I2l7NymWNhYEfQqYxSAQUS65cf9isgl6wcqUSWxZuRUNOAUQTAIAUFTg7mp9aP2DGIb1g5fZfL6Lg10D6ajVZzslOa2xG3Q/+G78LYH0tm6jyT7oHLOei9j4TJphXH+40xTcOU89Qr2Zl0eHRJy4GwR9MR0ePiqVeZV7t/vXFP9J7wcoFWOyJmSjYdYCogGggWfYMpy1+X23/GcW9YOUgbfig61ETMzPGTo6arqLxed9WsHrE8db2u+AopyX6Eiga0P7VEL5AG1R8hUqZakjtAqcXrCz68sz/0dr+/sGtpNQ0ICpAxjagV1sGyBZW1C/6sBesHFQTmjyabJpFSl0EDgFw3MJ9xrSh9Y+82QtWLrMsOl8n2ykh27mcLOcqUMpCKf7kOabi+rJVc1K9YO1J2yLn/YBS1kwCGoPIPgYG7zBdW8s8+ptDNt+3E3qpl3qpl3qpl3qpl3qpl3qpl3rpG0WhUEju7xqRSET6/f5urVPtn3R3TfH507/RhXRRUVGotbW1SCnVn4hGcs6jyWTyvu4wGT16tFZVVRU2TbPQsqxyRDxZSrksHo+/utciu2CKRqY9h2w1GxAAvcaVgTOPvavkoZ+rngZrr983bG1tHW6a5nwi6gcABUT0x+4yaWho4PF4fIFt2yMBoISIlBDiuX2ZS4Dnka1mp18AxVN/bnt2zWYAWNbTYO21B88Y2wIAQEQFROQQUbefi9DY2JhkjP2DiA4hIg4ACc55fJ9UX/JlKLmrMUgvMSFfOhhmuFewdF1vA4DMtUfFWPe/7t/Q0EAA8AHuustFlmXtE1gVOxY1sAL/NODsQ0B4+fDk02cNbVhkfSPB4pzbsOs7hgoAkvkwchwn6rYuj8ezzxseumXhFu73TjKKisYfTAe/V59VX18fBwA7s0kiyvdZLhnQJQBQLBbr1jpDd/TMXfd91qxRo0ZJr9c7U0r5AAA8I6Vc7PF4fo2IEQAARATDMChHxCw1DON6TdNe1DRtlaZp9wcCgfFZmqWIyMmsU1RURAAAPp/vWCnl3zjnywzDmBMOh3N+O3X8+PGa3+8fZxjGzUVFRZ0+qO3fv/8gwzAu0zTtXsbYUsbYs5qm3ev1eqeVlZX5stfyeDw4atQoHolEhmua9piUsgIAwO/3j5dSLhJCvK5p2uOBQOCM3QQZPHgwMwxjGmMs3h5zuvyLAUDHM6yKi4t1TdOuS1/e3+1PSrk0FAr1AQDQNG1M2t8RIjaUlJQM0nX9xuy5jDFlGEYHj3A4fLiU8vPMOERct3HjRpYG+iQhxHtd8QcA4pxv9/l8Y7PAup8x5uY5TAjxl1zzhRALOiaOGDECNU2bgoi2i8FHQoi7OOd3cs7fwfYr3AQAMSnlOS7nf21GUCHEainlT6WUP2eMbXQBdhMAgGEYHWABwE4p5RWZMTkAq/d4PCPSgHg558+4xq7O8Pd6vZe65pic838IIV7knL/lXpMx1jhmzBjdlRSPcPPTNO1aRCTG2D8556tdcxUAkM/nOxEAAKSUASHEBheSz/l8vlBZWZksLi6WmqZVIOKHaUFjfr//HACAvn37DswsyjnfEAqFvC5tKHNpAo0bN87wer2jOecZsBKc808452/7/f7jfD7faM7521laOScSifB+/fpJzvmdrvdWZfgYhhHhnO8wDONGKeUgwzAigUAg6PF4Qrqun+Vez+PxTMrMu+yyy3iWZrV4vd5LpZRBwzDCHo/nP9yASSmvAwCAYDA43nVqasyYMZ1svG/fvv045+9mwAqFQuektWq+S5BZ2aatadqyzPt+v3+y1+s92gUWcc43GYYxKDM+GAxWIOJXrkN7R9d1z5gxY5gQ4uZcYPXp00cUFxeXdhHFBef8fRf4v8nKH92m1umpJVLKCGNsnQusuwEAWDKZnOQa9NSaNWtiWUw7JdS23f4IDtu2p2SctRDitWxhlVId90lTqdTRjDE7a8jKZDK5yVUp1HDO33HNP8JxHH7qqadS2kVAhp8r2bW3b9++tYtUxUbEDa69+XKAldnj4k4pghA2IjZkXltWe5bDlFLHuhZYmSOhBKVUR94Qi8XiQ4YMKXIcJ5Rhatv2VzlOdrtr3VIictdyFuf8g93yGCFedL302baNN9xwAxGR5RrTZWgvLS3t6/P5hgshjg4Gg8PT1QIAAMTj8U5KYNt20nUAVVmapTB93TM7zzoUdiVRm7MHZFB1K01dXV2ZOyVIJBIvAIB7cUqlUh13SU3T1DVNc6ccJgB8ngOsapdmwdixY0Nvvvlmm213/byaSy65BB944IHLLMv65datWyPpdAhbW1sJAIwuE0wh0LbtjMtoSSZ35dptbW0580mhlAq4HKaVSnW+aoCIQJ1/EoF0XQ/H4x3VCkfE4/dSMtlKKXeHQwkhGk3TzD6Y+qyEOJVjkx0HGAqFggsXLnzENM3M82wSABAFACctN08nwXtrFnSqSqiLn4AQ7jdSqdRuJ1FQUCBaWlqE4zjpun+3Qhs0TXsU279h2lWV8GqW0Eoplcjh5zqtW1NTs8fSKplMXpsBijH2qaZp1w4aNGhlVVVVKxGBlPJuy7Iu3RtYXq8XXIffdbnDGGtzHCeQ1qLdHnxv2zZS+tnJiMgMw9Aty9qRJfTPAKB+LwKNcR9eMpnc7RKblDKY0RpErJdSqhxuAAAAJk6caCxduvRXGe33eDwTY7FYbVVVh/vhRBR2a2TG7LLJ5/PtE1gMAL50ATMye0AqlWK060HTqJTSiouLN7u1IRwOd+tZDF01HZVSg10vP2KMOTt27ECPx+PNHrtixYoxGatgjL1vmuamrNQFAaDIdRDZSrBXs8thRexD16QJOcZ4AMCbfh+VUsbGjRt3cs47HrOSSCR+eCAKVcdxxroEWx0IBKy5c+d2CjKZjSHiAPfe027CXdIIIhrR5Wm5cpDsuV2CJYR4wYX2AJ/P9+9ZY/oDQIlLE31ptV7kcsxXDBgwoO8eO55ZQSLb/40YMcJwHGdceiNxzvnf6+vrneeffx6VUjxbI4go7lp72DHHHNNJW03TnOI4TqSrqC6E6Ch/mpqasl0Gcs5FLjN8mTGWcmnJ7cFg8DQAgJKSkkMdx5nnetCgIKJQukKfwxjLmE9wx44dy4uKinJm04WFhYcnk0k748ARkYVCoU534quqqi5Xqv3HQhhjbwwcOPDNdKRiAKC5tICl67v3XebrXbdu3Z0urZqWTCbvYIy1ugDlXZmhEILl8NMy63ABIpGIEEL8uauqXQjRKISod72+2ZUSzHaPRcSEpmmLpZSXG4YxS9f1uZzzBsMwLpFSHssYU+mxbR6P53QAgKFDhwZ0Xb8+U8gjYjQQCFS42j+aEOIeF4+3XH5oYxZ/lT54YoxtY4zd5iqW52VpVse8wsLC07IcfoEQ4nXX3Ifc6cFAzvmqbKAQ0RFC3IKIr7iKzifKy8u1dN0o0+837am1EwgEjtd1/Qc5ugvkLrgZY7V9+vQZ7Rbc7/f7OefLXDJ92q9fv4L0pk5AxGQOuetDodAoIcRtrtrw2Y5WdUVFxD1e1/UpWcGhkDH2sUtBVgIA8HTobw0Gg8uVUvWMMZsxFkXEtznnfzryyCPvaGhoGICIW4joPSHEZ4lE4l3TNJPxeFwppVYYhvFPAPiSMdYmpdR1XQ8JIXYAwFrG2Ou6rj8KAHGlVBMibhNCJHVd9xqGYdi2XcUYW8k5vycQCPyyqampxi24YRgGEQ0loo845+8wxj4FgI9SqVSzZVlfpHlTugzawBhbahjGL6LR6DopZR8AsInoHc75zokTJ66sqqpSAFBummZICLEGET/VNK3Ksqwql8UYAFCKiO8BwLuMsa1KqRX/B/6+vN95cEnoAAAAAElFTkSuQmCC" alt="Debian Logo" class="floating_element">
+        <span class="floating_element">
+          Apache2 Debian Default Page
+        </span>
+      </div>
+<!--      <div class="table_of_contents floating_element">
+        <div class="section_header section_header_grey">
+          TABLE OF CONTENTS
+        </div>
+        <div class="table_of_contents_item floating_element">
+          <a href="#about">About</a>
+        </div>
+        <div class="table_of_contents_item floating_element">
+          <a href="#changes">Changes</a>
+        </div>
+        <div class="table_of_contents_item floating_element">
+          <a href="#scope">Scope</a>
+        </div>
+        <div class="table_of_contents_item floating_element">
+          <a href="#files">Config files</a>
+        </div>
+      </div>
+-->
+      <div class="content_section floating_element">
+
+
+        <div class="section_header section_header_red">
+          <div id="about"></div>
+          It works!
+        </div>
+        <div class="content_section_text">
+          <p>
+                This is the default welcome page used to test the correct 
+                operation of the Apache2 server after installation on Debian systems.
+                If you can read this page, it means that the Apache HTTP server installed at
+                this site is working properly. You should <b>replace this file</b> (located at
+                <tt>/var/www/html/index.html</tt>) before continuing to operate your HTTP server.
+          </p>
+
+
+          <p>
+                If you are a normal user of this web site and don't know what this page is
+                about, this probably means that the site is currently unavailable due to
+                maintenance.
+                If the problem persists, please contact the site's administrator.
+          </p>
+
+        </div>
+        <div class="section_header">
+          <div id="changes"></div>
+                Configuration Overview
+        </div>
+        <div class="content_section_text">
+          <p>
+                Debian's Apache2 default configuration is different from the
+                upstream default configuration, and split into several files optimized for
+                interaction with Debian tools. The configuration system is
+                <b>fully documented in
+                /usr/share/doc/apache2/README.Debian.gz</b>. Refer to this for the full
+                documentation. Documentation for the web server itself can be
+                found by accessing the <a href="http://192.168.0.15/manual">manual</a> if the <tt>apache2-doc</tt>
+                package was installed on this server.
+
+          </p>
+          <p>
+                The configuration layout for an Apache2 web server installation on Debian systems is as follows:
+          </p>
+          <pre>/etc/apache2/
+|-- apache2.conf
+|       `--  ports.conf
+|-- mods-enabled
+|       |-- *.load
+|       `-- *.conf
+|-- conf-enabled
+|       `-- *.conf
+|-- sites-enabled
+|       `-- *.conf
+          </pre>
+          <ul>
+                        <li>
+                           <tt>apache2.conf</tt> is the main configuration
+                           file. It puts the pieces together by including all remaining configuration
+                           files when starting up the web server.
+                        </li>
+
+                        <li>
+                           <tt>ports.conf</tt> is always included from the
+                           main configuration file. It is used to determine the listening ports for
+                           incoming connections, and this file can be customized anytime.
+                        </li>
+
+                        <li>
+                           Configuration files in the <tt>mods-enabled/</tt>,
+                           <tt>conf-enabled/</tt> and <tt>sites-enabled/</tt> directories contain
+                           particular configuration snippets which manage modules, global configuration
+                           fragments, or virtual host configurations, respectively.
+                        </li>
+
+                        <li>
+                           They are activated by symlinking available
+                           configuration files from their respective
+                           *-available/ counterparts. These should be managed
+                           by using our helpers
+                           <tt>
+                                a2enmod,
+                                a2dismod,
+                           </tt>
+                           <tt>
+                                a2ensite,
+                                a2dissite,
+                            </tt>
+                                and
+                           <tt>
+                                a2enconf,
+                                a2disconf
+                           </tt>. See their respective man pages for detailed information.
+                        </li>
+
+                        <li>
+                           The binary is called apache2. Due to the use of
+                           environment variables, in the default configuration, apache2 needs to be
+                           started/stopped with <tt>/etc/init.d/apache2</tt> or <tt>apache2ctl</tt>.
+                           <b>Calling <tt>/usr/bin/apache2</tt> directly will not work</b> with the
+                           default configuration.
+                        </li>
+          </ul>
+        </div>
+
+        <div class="section_header">
+            <div id="docroot"></div>
+                Document Roots
+        </div>
+
+        <div class="content_section_text">
+            <p>
+                By default, Debian does not allow access through the web browser to
+                <em>any</em> file apart of those located in <tt>/var/www</tt>,
+                <a href="http://httpd.apache.org/docs/2.4/mod/mod_userdir.html" rel="nofollow">public_html</a>
+                directories (when enabled) and <tt>/usr/share</tt> (for web
+                applications). If your site is using a web document root
+                located elsewhere (such as in <tt>/srv</tt>) you may need to whitelist your
+                document root directory in <tt>/etc/apache2/apache2.conf</tt>.
+            </p>
+            <p>
+                The default Debian document root is <tt>/var/www/html</tt>. You
+                can make your own virtual hosts under /var/www. This is different
+                to previous releases which provides better security out of the box.
+            </p>
+        </div>
+
+        <div class="section_header">
+          <div id="bugs"></div>
+                Reporting Problems
+        </div>
+        <div class="content_section_text">
+          <p>
+                Please use the <tt>reportbug</tt> tool to report bugs in the
+                Apache2 package with Debian. However, check <a href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?ordering=normal;archive=0;src=apache2;repeatmerged=0" rel="nofollow">existing bug reports</a> before reporting a new bug.
+          </p>
+          <p>
+                Please report bugs specific to modules (such as PHP and others)
+                to respective packages, not to the web server itself.
+          </p>
+        </div>
+
+
+
+
+      </div>
+    </div>
+    <div class="validator">
+    </div>
+  
+
+
+</body></html>
