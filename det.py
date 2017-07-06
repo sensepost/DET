@@ -387,7 +387,7 @@ def main():
                      f in listdir(results.folder)
                      if isfile(join(results.folder, f))]
         else:
-            files = results.file
+            files = list(set(results.file))
 
         threads = []
         for file_to_send in files:
