@@ -318,7 +318,7 @@ def main():
         description='Data Exfiltration Toolkit (Conix-Security)')
     parser.add_argument('-c', action="store", dest="config", default=None,
                         help="Configuration file (eg. '-c ./config-sample.json')")
-    parser.add_argument('-f', action="store", dest="file",
+    parser.add_argument('-f', action="append", dest="file",
                         help="File to exfiltrate (eg. '-f /etc/passwd')")
     parser.add_argument('-d', action="store", dest="folder",
                         help="Folder to exfiltrate (eg. '-d /etc/')")
@@ -376,7 +376,7 @@ def main():
                      f in listdir(results.folder)
                      if isfile(join(results.folder, f))]
         else:
-            files = [results.file]
+            files = results.file
 
         threads = []
         for file_to_send in files:
