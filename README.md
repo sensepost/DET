@@ -112,7 +112,7 @@ python det.py -h
 usage: det.py [-h] [-c CONFIG] [-f FILE] [-d FOLDER] [-p PLUGIN] [-e EXCLUDE]
               [-L | -Z]
 
-Data Exfiltration Toolkit (Conix-Security)
+Data Exfiltration Toolkit (SensePost)
 
 optional arguments:
   -h, --help  show this help message and exit
