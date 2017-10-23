@@ -36,7 +36,7 @@ Slides are available [here](https://docs.google.com/presentation/d/11uk6d-xougn3
 Clone the repo: 
 
 ```bash
-git clone https://github.com/conix-security/DET.git
+git clone https://github.com/sensepost/DET.git
 ```
 
 Then: 
