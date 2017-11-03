@@ -7,7 +7,7 @@ DET (is provided AS IS), is a proof of concept to perform Data Exfiltration usin
 
 The idea was to create a generic toolkit to plug any kind of protocol/service to test implmented Network Monitoring and Data Leakage Prevention (DLP) solutions configuration, against different data exfiltration techniques.
 
-The primary repository has now moved to [here[(https://github.com/PaulSec/DET).
+The primary repository has now moved to [here](https://github.com/PaulSec/DET).
 
 # Slides
 
