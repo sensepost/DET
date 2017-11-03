@@ -66,6 +66,10 @@ def listen():
         time.sleep(2)
 
 
+def proxy():
+    app_exfiltrate.log_message('info', "[proxy] [gmail] proxy mode unavailable (useless) for gmail plugin...")
+
+
 class Plugin:
 
     def __init__(self, app, options):
@@ -74,5 +78,5 @@ class Plugin:
         gmail_user = options['username']
         server = options['server']
         server_port = options['port']
-        app.register_plugin('gmail', {'send': send, 'listen': listen})
+        app.register_plugin('gmail', {'send': send, 'listen': listen, 'proxy': proxy})
         app_exfiltrate = app

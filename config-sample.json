@@ -2,7 +2,8 @@
     "plugins": {
         "http": {
             "target": "192.168.0.12",
-            "port": 8080
+            "port": 8080,
+            "proxies": ["192.168.0.13", "192.168.0.14"]
         },
         "google_docs": {
             "target": "SERVER",
@@ -11,7 +12,8 @@
         "dns": {
             "key": "google.com",
             "target": "192.168.0.12",
-            "port": 53
+            "port": 53,
+            "proxies": ["192.168.0.13", "192.168.0.14"]
         },
         "gmail": {
             "username": "dataexfil@gmail.com",
@@ -21,11 +23,13 @@
         },
         "tcp": {
             "target": "192.168.0.12",
-            "port": 6969
+            "port": 6969,
+            "proxies": ["192.168.0.13", "192.168.0.14"]
         },
         "udp": {
             "target": "192.168.0.12",
-            "port": 6969
+            "port": 6969,
+            "proxies": ["192.168.0.13", "192.168.0.14"]
         },
         "twitter": {
             "username": "PaulWebSec",
@@ -35,12 +39,28 @@
             "ACCESS_TOKEN_SECRET": "XXXXXXXXXXX"
         },
         "icmp": {
-            "target": "192.168.0.12"
+            "target": "192.168.0.12",
+            "proxies": ["192.168.0.13", "192.168.0.14"]
         },
         "slack": {
             "api_token": "xoxb-XXXXXXXXXXX",
             "chan_id": "XXXXXXXXXXX",
             "bot_id": "<@XXXXXXXXXXX>:"
+        },
+        "smtp": {
+            "target": "192.168.0.12",
+            "port": 25,
+            "proxies": ["192.168.0.13", "192.168.0.14"]
+        },
+        "ftp": {
+            "target": "192.168.0.12",
+            "port": 21,
+            "proxies": ["192.168.0.13", "192.168.0.14"]
+        },
+        "sip": {
+            "target": "192.168.0.12",
+            "port": 5060,
+            "proxies": ["192.168.0.13", "192.168.0.14"]
         }
     },
     "AES_KEY": "THISISACRAZYKEY",

@@ -1,2 +1,4 @@
 *.pyc
 *.pem
+build
+dist

