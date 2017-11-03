@@ -1,8 +1,13 @@
 DET (extensible) Data Exfiltration Toolkit
 =======
 
-DET (is provided AS IS), is a proof of concept to perform Data Exfiltration using either single or multiple channel(s) at the same time.
-The idea was to create a generic toolkit to plug any kind of protocol/service.
+DET (is provided AS IS), is a proof of concept to perform Data Exfiltration using either single or multiple channel(s) at the same time.  
+
+**This is a Proof of Concept aimed at identifying possible DLP failures. This should never be used to exfiltrate sensitive/live data (say on an assessment)**
+
+The idea was to create a generic toolkit to plug any kind of protocol/service to test implmented Network Monitoring and Data Leakage Prevention (DLP) solutions configuration, against different data exfiltration techniques.
+
+The primary repository has now moved to [here](https://github.com/PaulSec/DET).
 
 # Slides
 
@@ -295,3 +300,4 @@ Feel free if you want to contribute, clone, fork, submit your PR and so on.
 # License
 
 DET is licensed under a [MIT License](https://opensource.org/licenses/MIT). 
+Permissions beyond the scope of this license may be available at [info@sensepost.com](info@sensepost.com)

@@ -6,7 +6,7 @@
             "proxies": ["192.168.0.13", "192.168.0.14"]
         },
         "google_docs": {
-            "target": "conchwaiter.uk.plak.cc",
+            "target": "SERVER",
             "port": 8080
         },        
         "dns": {
