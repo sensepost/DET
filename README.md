@@ -296,7 +296,7 @@ Some pretty cool references/credits to people I got inspired by with their proje
 
 # Contact/Contributing
 
-You can reach me on Twitter [@PaulWebSec](https://twitter.com/PaulWebSec) (original author) or [@therealnisay](https://twitter.com/therealnisay) (maintainer of this repo). 
+You can reach me on Twitter [@PaulWebSec](https://twitter.com/PaulWebSec).
 Feel free if you want to contribute, clone, fork, submit your PR and so on.
 
 # License
